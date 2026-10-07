@@ -1,301 +1,265 @@
 # Numerical probes of seven results in the `openai/math` collection
 
-The repository [`openai/math`](https://github.com/openai/math) contains 722 mathematical
-manuscripts organised into 372 result families, produced by an internal OpenAI model and
-released at various stages of verification. Most of the collection is out of reach of a
-laptop: the statements are about motives, geometric Langlands, and von Neumann algebras,
-and the quantities involved are not computable in any direct sense.
+The repository [`openai/math`](https://github.com/openai/math) contains 722
+manuscripts organised into 372 result families, produced by an internal OpenAI model
+and released at varying stages of verification. The bulk of the collection concerns
+objects for which no direct numerical evaluation is available. The seven families
+treated here are those, among the 372 surveyed, whose central quantities can be
+computed directly.
 
-This repository takes seven of the families whose central objects *are* computable and
-probes them numerically. For each one it restates the theorem as it appears in the
-manuscript, implements the quantity the theorem is about, and compares the computation
-against the law the theorem predicts. The figures live in `results/figures/` and the
-summary statistics of each run in `results/`.
+For each family we state the theorem in the form given by the manuscript, identify
+the quantity the theorem constrains, implement it, and compare the result against the
+predicted law. Figures are in `results/figures/` and per-run statistics in
+`results/`. The animated presentation of the same computations is in `docs/`.
 
-## What this is and is not
+## Status of the computations
 
-It is a check that the stated asymptotic laws are consistent with the arithmetic at the
-scale a single machine can reach, and a set of pictures of those laws. It is not a
-verification of any proof. Where a computation agrees with a manuscript, that is evidence
-about the statement, not about the argument. Where it disagrees, the disagreement is more
-likely to be a finite-range effect than an error in the manuscript, and the two places
-where the numbers do not settle are called out below.
+A numerical agreement with a stated asymptotic law is evidence about the statement
+and not about the proof; a disagreement admits two readings, of which an error in the
+manuscript is the less likely. In six of the seven cases below the computed quantity
+approaches the predicted value over the accessible range. In one case, family 011,
+the approach is measurably incomplete at the largest limit we could reach, and we
+quantify the shortfall rather than treat it as noise. One computation, family 003,
+does not test the theorem at all, for reasons given in that section.
 
-The figures are also not decoration on a claim: for several of these results the plotted
-quantity is the theorem's own limit, so a figure that looked wrong would be informative.
+## Summary
 
-## The seven results
-
-| # | Family | Statement probed | Figures |
+| Family | Quantity computed | Predicted | Result |
 |---|---|---|---|
-| 011 | Prime-factor statistics of `p-1` | The normalised logarithms of the prime factors of `p-1` converge to the Poisson--Dirichlet law `PD(1)` | `011-poisson-dirichlet` |
-| 012 | Independent largest prime factors of consecutive integers | `P+(n)` and `P+(n+1)` are asymptotically independent, and `P+(n) < P+(n+1)` has density `1/2` | `012-joint-dickman` |
-| 021 | A quadratic bound for Jacobsthal's function | `h(k) <= C k^2 / (log log 3k)^2` | `021-jacobsthal` |
-| 026 | Positive lower density of large prime gaps | For each fixed `C > 0` a positive proportion of gaps satisfy `d_n > C log p_n` | `026-prime-gaps` |
-| 025 | Short Egyptian fractions | `N(b)`, the worst-case minimum length, is `Theta(log log b)` | `025-egyptian-fractions` |
-| 017 | The irrationality exponent of `pi` | `mu(pi) = 2` | `017-pi-exponent` |
-| 003 | The quasi-Riemann hypothesis | Every Dirichlet `L`-function is zero-free in `Re s > 7/8` | `003-quasi-riemann` |
+| 011 | `V_j(p)` for primes `p <= 3*10^7` | `PD(1)` | components 1–2 agree; 3–8 deviate, see text |
+| 012 | density of `P+(n) < P+(n+1)`, `n <= 6*10^7` | `1/2` | `0.499983` |
+| 021 | `j(P_k)`, `k <= 10` | `<= C k^2/(log log 3k)^2` | ratio rises to `0.71`, then flat |
+| 026 | density of `d_n > C log p_n`, `p <= 2*10^8` | positive for each `C` | `0.60, 0.34, 0.11` at `C = 0.5, 1, 2` |
+| 025 | `N(b)`, `b <= 220` | `Theta(log log b)` | `N(b)/log log b` in `[2.43, 4.80]` |
+| 017 | `q^2 abs(pi - p/q)`, 40 convergents | bounded, `mu(pi) = 2` | max `1`, exponent settles at `2.0` |
+| 003 | 600 zeros of `zeta`, with real parts | no zero in `Re s > 7/8` | 0 violations; claim not tested |
 
-## 011. The Poisson--Dirichlet law for prime predecessors
+---
 
-**The theorem.** For a prime `p`, list the prime factors of `p - 1` with multiplicity in
-decreasing order as `q_1 >= q_2 >= ...`, and set
+## 011. Prime-factor statistics of `p - 1`
 
-```
-V_j(p) = log q_j(p) / log(p - 1),      q_j(p) = 1 once the list is exhausted.
-```
-
-The manuscript proves that for every fixed `k` and every bounded continuous
-`F : [0,1]^k -> R`,
+**Theorem.** For a prime `p`, let `q_1(p) >= q_2(p) >= ...` be the prime factors of
+`p - 1` listed with multiplicity, and set `q_j(p) = 1` once the list is exhausted.
+Put `V_j(p) = log q_j(p) / log(p - 1)`. Then for every fixed `k` and every bounded
+continuous `F: [0,1]^k -> R`,
 
 ```
 (1/(pi(x) - 1)) * sum_{3 <= p <= x} F(V_1(p), ..., V_k(p))  ->  E F(L_1, ..., L_k),
 ```
 
 where `(L_1, L_2, ...)` is the decreasing rearrangement of the stick-breaking sequence
-`B_1 = 1 - U_1`, `B_j = (U_1 ... U_{j-1})(1 - U_j)`, whose law is `PD(1)`. This resolves a
-conjecture of Ford, Konyagin and Luca.
+`B_1 = 1 - U_1`, `B_j = (U_1 ... U_{j-1})(1 - U_j)`, whose law is `PD(1)`. This
+resolves a conjecture of Ford, Konyagin and Luca.
 
-**What is computed.** Every prime to `3 * 10^7` is factored by sieving the largest prime
-factor of each integer up to the limit, giving `1,857,858` primes. The reference law is
-handled two ways: `L_1` has the exact Dickman distribution, `Pr[L_1 <= x] = rho(1/x)`, with
-`rho` obtained by fourth-order integration of the delay equation `u rho'(u) = -rho(u-1)`;
-and the remaining components are drawn by stick breaking with the leading `12` fragments
-kept, which drops a tail of mean `2^-12`.
+**Computation.** The largest prime factor of every integer up to `3*10^7` is obtained
+by sieving, which factors `p - 1` for all `1,857,858` primes in the range. The
+reference law is generated in two ways: `L_1` has the exact distribution
+`Pr[L_1 <= x] = rho(1/x)`, with `rho` obtained by fourth-order integration of the delay
+equation `u rho'(u) = -rho(u-1)`; the remaining components are drawn by stick breaking
+with the leading twelve fragments retained, a tail of mean `2^-12`.
 
-**Figures and numbers.** The left panel of `011-poisson-dirichlet` overlays the empirical
-distribution function of `V_j` on the simulated law for `j = 1, 2, 3, 4`; the middle panel
-is the density of the first four components; the right panel tracks the mean of `V_1` over
-successive ranges of `x`.
+**Results.** Write `e_j` for the empirical mean of `V_j` over all primes in range and
+`lambda_j` for the corresponding `PD(1)` mean from `4*10^5` draws.
 
-The empirical mean of `V_1` rises from `0.5932` in the smallest window to `0.5996` in the
-largest, against a `PD(1)` value of `0.6242`. This shortfall is the one place in this
-repository where the computation does not obviously reach the predicted law. It is not
-noise: with `1.86 * 10^6` samples the standard error is about `0.001`. The regime of the
-limit is `x -> infinity`, and at `x = 3 * 10^7` the largest prime factor of `p - 1` is
-still systematically smaller than the limiting stick fragment, because the largest part
-is governed by the shifted Dickman law `Pr[P+(p-1) <= x^{1/u}] -> rho(u)`, whose approach
-is logarithmic in `x`. The mean is still moving upward across the windows in a way
-consistent with slow convergence rather than with a different limit, but this repository's
-range is not enough to demonstrate that, and the Kolmogorov--Smirnov distances to the
-simulated law (reported in `results/011-poisson-dirichlet.json`) are correspondingly
-large for `j >= 3`. The first two components agree well.
+| `j` | `e_j` | `lambda_j` | `e_j / lambda_j` | KS distance |
+|---:|---:|---:|---:|---:|
+| 1 | 0.5976 | 0.6245 | 0.957 | 0.045 |
+| 2 | 0.1968 | 0.2094 | 0.940 | 0.075 |
+| 3 | 0.0891 | 0.0882 | 1.010 | 0.265 |
+| 4 | 0.0503 | 0.0403 | 1.248 | 0.426 |
+| 5 | 0.0301 | 0.0190 | 1.584 | 0.433 |
+| 6 | 0.0173 | 0.0090 | 1.922 | 0.430 |
+
+Two features require comment. The first two components agree with `PD(1)` to within a
+few per cent, and `e_1` increases monotonically across six equal windows of the prime
+range, from `0.5932` to `0.5996`, so the discrepancy has the sign and the monotonicity
+of an unconverged limit rather than of a different one. The components from `j = 3`
+onward, however, exceed their predicted means by factors that grow with `j`, and the
+Kolmogorov--Smirnov distances against the simulated law are correspondingly large. The
+mass accounted for by the first eight components is `0.99542`, against `0.99607` for
+`PD(1)`.
+
+The deficit is consistent with the known slow convergence of the largest-part law:
+the theorem's regime is `x -> infinity`, and the largest prime factor of `p - 1` is
+governed by a shifted Dickman law whose approach is logarithmic in `x`. The behaviour
+we observe is that the empirical partition of logarithmic mass is flatter than
+`PD(1)` at this scale, carrying more mass in intermediate components and less in the
+leading one. We do not claim this identifies the mechanism, and the range
+`x <= 3*10^7` is in any case too short to establish the rate. What can be said is that
+the first two components are consistent with the theorem while the remainder are not,
+and that no attempt was made to extend the computation far enough to decide whether
+the deviation decays.
 
 ## 012. Independence of the largest prime factors of consecutive integers
 
-**The theorem.** For fixed `a, b` in `(0, 1)`,
+**Theorem.** For fixed `a, b` in `(0, 1)`,
 
 ```
 (1/X) # {2 <= n <= X : P+(n) <= n^a, P+(n+1) <= n^b}  ->  rho(1/a) rho(1/b),
 ```
 
-so that `x_n = log P+(n)/log n` and `y_n = log P+(n+1)/log n` have independent limiting
-distributions with common distribution function `a -> rho(1/a)`. A corollary is that
-`P+(n) < P+(n+1)` has natural density `1/2`.
+so that `x_n = log P+(n)/log n` and `y_n = log P+(n+1)/log n` have independent
+limiting distributions with common distribution function `a -> rho(1/a)`. It follows
+that `P+(n) < P+(n+1)` has natural density `1/2`.
 
-**What is computed.** `P+(n)` for every `n <= 6 * 10^7` by the same largest-prime-factor
-sieve. The comparison density is measured directly, and the joint distribution of
-`(x_n, y_n)` is binned on a grid to compare the joint distribution function against the
-product of the two marginals.
+**Computation.** `P+(n)` for all `n <= 6*10^7`, by the same largest-prime-factor sieve.
+The comparison density is evaluated directly, and the joint distribution of
+`(x_n, y_n)` is binned on a uniform grid to compare the joint distribution function
+against the product of the two marginals.
 
-**Figures and numbers.** In `012-joint-dickman` the left panel is the joint density, the
-middle panel contrasts the joint distribution function with the product of marginals along
-the diagonal, and the right panel puts the empirical marginal against `rho(1/a)`.
+**Results.** Over `59,999,998` consecutive pairs the density of `P+(n) < P+(n+1)` is
+`0.499983`. Evaluated in six equal windows the values are `0.50000`, `0.50005`,
+`0.49995`, `0.50000`, `0.50001`, `0.49989`; there is no monotone drift. The supremum
+distance between the binned joint distribution function and the product of marginals
+is `0.0051`, which is of the order of the binning bias and does not decrease further
+with sample size over the range examined. The empirical marginal of `x_n` lies below
+`rho(1/a)` for `a` near `1`, by `0.039` at `a = 0.8` and `a = 0.9`; this is the same
+direction of finite-range effect as in family 011, and we note it rather than
+attribute it.
 
-Over `59,999,998` consecutive pairs the density of `P+(n) < P+(n+1)` is `0.49998`. In six
-equal windows it is `0.50000, 0.50005, 0.49995, 0.50000, 0.50001, 0.49989`, so there is no
-drift in `x`. The supremum distance between the binned joint distribution function and the
-product of marginals is `0.0051`, which is the order of the binning bias rather than
-evidence of dependence.
+## 021. A quadratic bound for Jacobsthal's function
 
-## 021. Jacobsthal's function and the quadratic bound
-
-**The theorem.** Let `j(n)` be the least `m` such that every interval of `m` consecutive
-integers contains an integer coprime to `n`, and
-
-```
-h(k) = sup { j(n) : omega(n) <= k }.
-```
-
+**Theorem.** Let `j(n)` be the least `m` such that every interval of `m` consecutive
+integers contains an integer coprime to `n`, and `h(k) = sup { j(n) : omega(n) <= k }`.
 Then `h(k) <= C k^2 / (log log 3k)^2` for every `k >= 1`, with `C` absolute. Since
-replacing `n` by its radical does not change `j(n)`, `h(k) - 1` is the greatest length of a
-run of consecutive integers that can be covered by the divisibility classes of `k` primes.
-This answers Jacobsthal's question whether `h(k) << k^2` and improves Iwaniec's
+replacing `n` by its radical does not change `j(n)`, `h(k) - 1` is the greatest length
+of a run of consecutive integers covered by the divisibility classes of `k` primes.
+The bound answers Jacobsthal's question whether `h(k) << k^2` and improves Iwaniec's
 `h(k) << k^2 log^2 k`.
 
-**What is computed.** `h` is a supremum over all sets of at most `k` primes, so only lower
-bounds are computable. For a prime set the multiples are periodic with period equal to the
-product of the primes, so `j` is found by sieving one period and taking the longest covered
-run, plus one. The product of the first `k` primes grows like `e^{k log k}`, so the
-computation is capped at `k = 10`, where the period is `6,469,693,230`. The values found,
-`2, 4, 6, 10, 14, 22, 26, 34, 40, 46`, reproduce the published sequence for the primorials
-`j(P_k)`.
+**Computation.** `h` is a supremum over all sets of at most `k` primes, so only lower
+bounds are accessible. For a fixed prime set the multiples are periodic with period
+equal to the product of the primes, and `j` is the longest covered run in one period,
+plus one. That product grows as `e^{k log k}`, which limits the computation to `k = 10`,
+where the period is `6,469,693,230`. The values obtained,
 
-**Figures and numbers.** `021-jacobsthal` plots the computed values against both the new
-bound shape and Iwaniec's, and then the ratio of the values to each envelope. Against the
-new envelope the implied constant rises to about `0.71` and then flattens; against
-Iwaniec's it falls from `0.55` to `0.09`. Both are consistent with the theorems, since a
-lower bound for `h` can only ever sit below an upper bound, and the figure should be read
-as showing that the quadratic scale is not vacuous at these `k`, not as estimating `C`.
+```
+j(P_k) = 2, 4, 6, 10, 14, 22, 26, 34, 40, 46    (k = 1, ..., 10),
+```
 
-The primorial case is not the extremal case in general: for `k = 24` one has
-`j(P_24) = 234 < 236 = h(24)`, so the values here are lower bounds for `h(k)`.
+reproduce the published primorial sequence.
+
+**Results.** Writing `E(k) = k^2/(log log 3k)^2`, the ratios `j(P_k)/E(k)` for
+`k = 3, ..., 10` are
+
+```
+0.413, 0.518, 0.556, 0.688, 0.658, 0.710, 0.702, 0.689,
+```
+
+and the corresponding ratios against Iwaniec's envelope `k^2 log^2 k` fall from
+`0.552` to `0.087`. Both sequences are consistent with the respective theorems, a lower
+bound for `h` being necessarily below an upper bound. The first sequence rises and then
+flattens near `0.70`; we do not interpret this as an estimate of `C`, since the range in
+`k` is short and the primorial case is not extremal in general. On the latter point, the
+manuscript notes that `j(P_24) = 234 < 236 = h(24)`, so the computed values bound `h(k)`
+strictly from below.
 
 ## 026. Positive lower density of large prime gaps
 
-**The theorem.** With `d_n = p_{n+1} - p_n`, for every fixed real `C > 0` there are
+**Theorem.** With `d_n = p_{n+1} - p_n`, for every fixed real `C > 0` there are
 `c(C) > 0` and `N_0(C)` such that
 
 ```
 # {1 <= n <= N : d_n > C log p_n} >= c(C) N      for all N >= N_0(C).
 ```
 
-The density is measured by counting prime indices, not integers. A corollary is that the
-Erdős--Prachar set `{n : p_n/n < p_{n+1}/(n+1)}` has positive lower density.
+The density is taken over prime indices. Consequently the set
+`{n : p_n/n < p_{n+1}/(n+1)}` has positive lower density; the equivalence with
+`d_n > p_n/n` is exact.
 
-**What is computed.** All primes to `2 * 10^8`, giving `11,078,937` primes and as many
-gaps, and the exceedance proportion for thresholds `C` from `0.25` to `3`, both over the
-whole range and within ten contiguous blocks.
+**Computation.** All primes to `2*10^8`, giving `11,078,937` gaps, and the exceedance
+proportion at thresholds `C` in `[0.25, 3]`, both over the full range and within ten
+contiguous blocks.
 
-**Figures and numbers.** `026-prime-gaps` shows the exceedance curve with the Cramér
-heuristic `e^{-C}` for reference, the distribution of `d_n / log p_n`, and the block-by-block
-stability of the density.
-
-The proportion of gaps above `C log p_n` is `0.66` at `C = 0.5`, `0.37` at `C = 1`, and
-`0.11` at `C = 2`. Across ten blocks these are flat, staying within about `3%` of their
-means, which is the content of the positive-density statement that a single count could not
-show. The largest gap in the range is `248`, at a ratio `d_n / log p_n` of `13.0`; the
-Cramér heuristic lies above the measured curve at large `C`, as expected. The
-Erdős--Prachar density is `0.4199`, and the equivalence with `d_n > p_n/n` used to compute
-it is exact.
+**Results.** The proportion of gaps exceeding `C log p_n` is `0.602` at `C = 0.5`,
+`0.338` at `C = 1` and `0.110` at `C = 2`. Across the ten blocks each of these is
+constant to within about `3` per cent of its mean; for `C = 1` the block values are
+`0.380, 0.394, 0.408, 0.382, 0.355, 0.360, 0.364, 0.367, 0.370, 0.373`, which shows the
+stabilisation that a single count over the whole range could not. The largest gap in
+range is `248`, at `d_n / log p_n = 13.0`. The heuristic Poisson reference `e^{-C}` lies
+above the measured curve for `C > 1.6`. The Erdős--Prachar density is `0.4199`.
 
 ## 025. Short Egyptian fractions
 
-**The theorem.** For integers `1 <= a < b` let `N(a, b)` be the least `k` with
-`a/b = 1/n_1 + ... + 1/n_k` for distinct `2 <= n_1 < ... < n_k`, with no bound on the
-denominators, and put `N(b) = max_{1 <= a < b} N(a, b)`. Then
+**Theorem.** For integers `1 <= a < b` let `N(a, b)` be the least `k` for which
+`a/b = 1/n_1 + ... + 1/n_k` with `2 <= n_1 < ... < n_k` distinct and no bound on the
+denominators, and set `N(b) = max_{1 <= a < b} N(a, b)`. Then
 
 ```
 c_1 log log b <= N(b) <= c_2 log log b,
 ```
 
-which proves Erdős's conjecture and improves the earlier `log b / log log b` and
-`sqrt(log b)` bounds.
+which proves Erdős's conjecture and improves the earlier bounds `log b / log log b`
+and `sqrt(log b)`.
 
-**What is computed.** `N(b)` exactly for every `b <= 220`. For each numerator the search is
-by iterative deepening on the number of terms with exhaustive search at each depth, using
-exact rational arithmetic and two bounds: the remaining terms are at most `1/n` each and at
-least `1/(n+t-1)` each. Failure within the cap therefore certifies a larger minimum length,
-so these are true minima and `N(b)` is a true maximum. The greedy expansion is computed for
-comparison.
+**Computation.** `N(b)` exactly for every `b <= 220`. For each numerator the expansion
+is sought by iterative deepening on the number of terms, exhaustive at each depth, in
+exact rational arithmetic, using two bounds: at a node with remainder `r`, `t` terms
+remaining and least usable denominator `n`, one has `t/n >= r` and
+`1/(n + t - 1) <= r`. A search that fails within the depth cap therefore certifies a
+larger minimum length, so the tabulated values are exact. The greedy expansion is
+computed alongside for comparison.
 
-**Figures and numbers.** `025-egyptian-fractions` gives the minimum length against the
-worst-case greedy length, the growth against the three bound shapes, and the ratio `N(b) /
-log log b`.
-
-`N(b)` reaches `6` in this range and is non-decreasing in steps, while the worst greedy
-length reaches `9`; the greedy algorithm is not minimal, and `5/121` is a small example
-where it needs five terms against the optimal three. The ratio `N(b)/log log b` lies
-between `2.4` and `4.8` and drifts slowly downward as `b` grows, which is the behaviour
-expected of a bounded `c_2` in the conjectured order. The range `b <= 220` is far too short
-to distinguish `log log b` from `sqrt(log b)` or `log b / log log b` by growth alone, which
-is why that panel plots all three.
+**Results.** `N(b)` attains `6` on this range while the worst-case greedy length attains
+`9`; the greedy algorithm is not minimal. The least example in the range is `a/b = 5/121`,
+where greedy requires five terms and three suffice. The ratio `N(b)/log log b` lies in
+`[2.43, 4.80]` and drifts slowly downward over the range, which is the behaviour a
+bounded `c_2` predicts. The range `b <= 220` does not separate `log log b` from
+`sqrt(log b)` or `log b / log log b` by growth alone, and the figure plots all three
+envelopes for that reason.
 
 ## 017. The irrationality exponent of `pi`
 
-**The theorem.** The irrationality exponent
+**Theorem.** The irrationality exponent of an irrational real `x` is
 
 ```
-mu(x) = sup { nu > 0 : 0 < |x - p/q| < q^{-nu} for infinitely many p, q in Z }
+mu(x) = sup { nu > 0 : 0 < |x - p/q| < q^{-nu} for infinitely many p, q in Z }.
 ```
 
-of `pi` is exactly `2`: for every `nu > 2` there is `Q(nu)` with `|pi - p/q| >= q^{-nu}` for
-all integers `p` and `q >= Q(nu)`, whether or not the fraction is reduced. Consequently the
-Flint--Hills series `sum 1/(n^3 sin^2 n)` converges.
+The manuscript proves `mu(pi) = 2`: for every `nu > 2` there is `Q(nu)` such that
+`|pi - p/q| >= q^{-nu}` for all integers `p` and `q >= Q(nu)`, the fraction need not be
+in lowest terms. Consequently the Flint--Hills series `sum 1/(n^3 sin^2 n)` converges.
 
-**What is computed.** The continued fraction of `pi` to forty terms at 150 digits, the
-convergents as exact integers, and the quantity `q^2 |pi - p/q|` for each. Using Python
-integers and arbitrary-precision errors matters here: the convergents reach denominators
-above `10^22`, where a float64 representation of `q` destroys the squared quality.
+**Computation.** The continued fraction of `pi` to forty terms at 150 digits, with
+convergents held as exact integers and the errors as arbitrary-precision values. The
+representation matters: the convergents reach `q > 6*10^22`, where a float64
+representation of `q` destroys the quantity `q^2 |pi - p/q|` entirely.
 
-**Figures and numbers.** `017-pi-exponent` shows the squared quality for `pi` alongside
-`sqrt(2)` and Catalan's constant, the empirical exponent `-log|pi - p/q| / log q`, and the
-partial quotients.
-
-For `pi` the squared quality oscillates in `[0.0034, 1]`, always below `1`, and the
-empirical exponent settles at `2.0` over the last ten convergents. The exponent is a
-statement about the best approximations, so it is a lower estimate for `mu` and can dip
-below `2` at individual convergents; what the definition asks for is the limsup, and the
-figure shows the values approaching `2` from above and staying there. `sqrt(2)` behaves
-identically, as it must, since its partial quotients are bounded; Catalan's constant does
-not, which is the point of the comparison. The largest partial quotient of `pi` in this
-range is `292`, at index 4.
+**Results.** The quantities `q^2 |pi - p/q|` at the convergents have maximum `0.95` and
+minimum `0.0034`, so the sequence is bounded above by `1` as the theorem requires,
+and the empirical exponent `-log|pi - p/q| / log q` settles at `2.0` over the final ten
+convergents. The exponent is defined by a supremum over infinitely many approximants, so
+this is a lower estimate and individual convergents take values below `2`; what the
+figure shows is the running median of the exponents converging to `2` from above and
+remaining there. The control `sqrt(2)`, whose partial quotients are also bounded,
+behaves identically. Catalan's constant does not, which is the purpose of the
+comparison. The largest partial quotient of `pi` in range is `292`, at index `4`.
 
 ## 003. The quasi-Riemann hypothesis
 
-**The theorem.** Every finite-order Hecke `L`-function over `Q(sqrt(-3))` and every
-Dirichlet `L`-function, `zeta` included, has no zero in `Re s > 7/8`, the pole at `s = 1`
-for a principal character allowed. By the functional equation the nontrivial zeros of
-`zeta` therefore satisfy `1/8 <= Re s <= 7/8`, which excludes an exceptional real zero in
-`(7/8, 1)`. The theorem does not place the zeros on `Re s = 1/2`.
+**Theorem.** Every finite-order Hecke `L`-function over `Q(sqrt(-3))` and every
+Dirichlet `L`-function, `zeta` included, has no zero in `Re s > 7/8`, the pole at
+`s = 1` for a principal character excepted. By the functional equation the nontrivial
+zeros of `zeta` then satisfy `1/8 <= Re s <= 7/8`, so an exceptional real zero in
+`(7/8, 1)` is excluded. The theorem does not place zeros on `Re s = 1/2`.
 
-**What is computed.** The first `600` nontrivial zeros of `zeta`, to height `939`, with
-their real parts as actually returned by the computation rather than assumed, and the
-count against the Riemann--von Mangoldt smooth count `theta(T)/pi + 1`.
+**Computation.** The first `600` nontrivial zeros of `zeta`, to height `939.02`, with
+real parts recorded as returned rather than assumed, and the count compared with the
+Riemann--von Mangoldt smooth count `theta(T)/pi + 1`.
 
-**Figures and numbers.** `003-quasi-riemann` draws the classical de la Vallée Poussin
-boundary `1 - c/log t` against the fixed line `7/8`, plots the counting residual
-`k - (theta(t_k)/pi + 1)`, and shows the fraction of zeros with real part above `sigma` for
-a range of `sigma`.
+**Results.** All `600` zeros have real part `0.5`; the number lying in `Re s > 7/8` is
+`0`, and the margin is `0.375`. The count below `T = 939.02` is `600` against a smooth
+prediction of `599.72`, a deviation of `0.28`.
 
-The two boundaries are qualitatively different objects. The classical region approaches
-`Re s = 1` as the height grows and never bounds a zero-free half-plane; the theorem's
-boundary is a vertical line cutting the strip at every height, which is what makes it
-stronger. All `600` computed zeros have real part `0.5`, so none lies in `Re s > 7/8`: the
-number of violations is `0` and the margin is `0.375`. The count of zeros below `T = 939.02`
-is `600` against a smooth prediction of `599.72`, a deviation of `0.28`, which confirms the
-zero finder is neither missing nor inventing zeros.
+These numbers do not test the theorem. The zeros are located on the critical line, so
+their real parts are `1/2` by construction and a zero at, say, `Re s = 0.7` would not
+appear in the output at all. The computation verifies only that the zero finder is
+consistent with the count formula, and the figure should be read as a drawing of the
+claimed region. This limitation is intrinsic to the method rather than to the
+implementation, and it is stated here because a reader could otherwise take the empty
+intersection for confirmation.
 
-This says nothing about zeros off the critical line. `mpmath.zetazero` solves on the line,
-so the real parts are `1/2` by construction, and a zero at, say, `Re s = 0.7` would not
-appear in the computation at all. The figure is a picture of the claimed region, not a test
-of it.
-
-## The animated site
-
-`docs/` is a static GitHub Pages site. It loads one JavaScript file of numerical
-series and renders seven animations, each a function of a single progress parameter
-so that the same code drives the autoplay, the scrubber, and the first frame.
-
-- **011** the density of `V_1` fills in as primes accumulate, against the exact PD(1)
-  density `x · rho(1/x − 1)`; a second panel tracks the six component means.
-- **012** the comparison density converges on `1/2` while the independence gap falls.
-- **021** `j(P_k)` grows against both bound envelopes, with the implied constant flat
-  or falling.
-- **026** the exceedance curves for several `C` build up and hold; a second panel
-  shows the same densities in successive blocks.
-- **025** the greedy expansion of `5/121` walks down a log-scaled remainder staircase
-  while the worst-case ratio `N(b)/log log b` drifts.
-- **017** `q²|π − p/q|` accumulates for the convergents and the running median of the
-  exponent settles on `2`.
-- **003** 600 zeros of `zeta` accumulate on `Re s = 1/2`, with the theorem's fixed
-  `7/8` boundary and the classical `1 − c/log t` region for contrast.
-
-The page honours `prefers-reduced-motion` by not autoplaying, gives every animation a
-play/pause control and a scrubber, and starts each one only when it scrolls into view.
-
-To rebuild the series and refresh the site previews:
-
-```
-python scripts/build_site_data.py                 # writes docs/data.js
-python scripts/build_site_data.py --only pi,quasi # replaces named series only
-node scripts/check_site.js                        # renders every card headlessly
-node scripts/render_previews.js                   # PNGs into results/site-previews/
-```
-
-`scripts/check_site.js` catches runtime errors in the animation code without a
-browser; `scripts/render_previews.js` needs `canvas` from npm and writes the frames
-used to check the layout visually.
+---
 
 ## Reproducing
 
@@ -306,15 +270,38 @@ python scripts/run_experiments.py --only 011,026  # a subset
 python -m pytest                                  # 99 tests
 ```
 
-The numerical limits are in `config.json` and read through `openmath.config`; the defaults
-finish in a few minutes. Each probe writes `results/<id>.json` and a figure under
-`results/figures/` as both PNG and PDF.
+Numerical limits are in `config.json`, read through `openmath.config`. The defaults
+complete in a few minutes on one machine. Each probe writes `results/<id>.json` and a
+figure under `results/figures/` in both PNG and PDF.
 
-The tests check the ingredients rather than the conclusions: the Dickman function against
-its published values, the `PD(1)` sampler against the exact `L_1` distribution, the
-Jacobsthal values against the published primorial sequence, the Egyptian-fraction search
-against exhaustive minimality, the `zeta` zeros against the published ordinates, and every
-theorem's degenerate cases.
+The test suite checks the inputs rather than the conclusions. It covers the Dickman
+function against its published values, the `PD(1)` sampler against the exact law of
+`L_1`, the Jacobsthal values against the published primorial sequence, the Egyptian
+search against exhaustive minimality, the `zeta` zeros against the published ordinates,
+and the degenerate cases of each implemented identity.
+
+## The animated site
+
+`docs/` is a static site deployed to GitHub Pages. It loads one file of numerical
+series and renders seven animations, each expressed as a function of a single progress
+parameter so that the same code drives the autoplay, the scrubber, and the static first
+frame. Each card states its theorem, gives a live numerical readout, and captions the
+two panels.
+
+The page suppresses autoplay under `prefers-reduced-motion`, provides a play/pause
+control and a scrubber for every animation, and begins each one only when it enters the
+viewport. To rebuild the series and refresh the previews:
+
+```
+python scripts/build_site_data.py                 # writes docs/data.js
+python scripts/build_site_data.py --only pi,quasi # replaces the named series only
+node scripts/check_site.js                        # renders every card headlessly
+node scripts/render_previews.js                   # PNGs into results/site-previews/
+```
+
+`scripts/check_site.js` executes the animation code without a browser and catches
+runtime errors; `scripts/render_previews.js` requires the `canvas` package from npm and
+writes the frames used to inspect layout.
 
 ## Layout
 
@@ -342,7 +329,7 @@ results/                  JSON summaries, figures, and site previews
 
 ## References
 
-The manuscripts are in `openai/math`. The seven probed here are
+The probed manuscripts, with their directories in `openai/math`:
 
 - *The Poisson--Dirichlet Law for Prime Predecessors*,
   `preprints/The-Poisson-Dirichlet-Law-for-Prime-Predecessors-September-24-2026`
@@ -355,10 +342,10 @@ The manuscripts are in `openai/math`. The seven probed here are
 - *Short Egyptian fractions*, `preprints/Short-Egyptian-fractions-September-25-2026`
 - *The irrationality exponent of pi is 2*,
   `preprints/The-irrationality-exponent-of-pi-is-2-September-24-2026`
-- *The Quasi-Riemann Hypothesis: A Zero-Free Half-Plane `Re s > 7/8`*,
+- *The Quasi-Riemann Hypothesis: A Zero-Free Half-Plane* `Re s > 7/8`,
   `preprints/The-Quasi-Riemann-Hypothesis-September-30-2026`
 
-Classical inputs used for the reference values: Dickman (1930) for `rho`; Ford, Konyagin
-and Luca (2010) for the prime-predecessor conjecture; Erdős and Pomerance (1978) for the
-consecutive-integer problem; Iwaniec (1978) and Vaughan (1977) for Jacobsthal's function;
-Erdős (1950) and Vose (1985) for Egyptian fractions.
+Reference values and prior bounds are taken from Dickman (1930) for `rho`; Ford,
+Konyagin and Luca (2010) for the prime-predecessor conjecture; Erdős and Pomerance
+(1978) for the consecutive-integer problem; Iwaniec (1978) and Vaughan (1977) for
+Jacobsthal's function; Erdős (1950) and Vose (1985) for Egyptian fractions.

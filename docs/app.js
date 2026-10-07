@@ -190,11 +190,11 @@ class Animation {
 const CARDS = [
   {
     id: 'pd', tag: '011', title: 'Prime factors of p−1 follow the Poisson–Dirichlet law',
-    theorem: `List the prime factors of p−1 with multiplicity in decreasing order, q₁ ≥ q₂ ≥ …, and set Vⱼ(p) = log qⱼ(p) / log(p−1). For every fixed k, the joint law of (V₁,…,V_k) over primes p ≤ x converges to the first k components of PD(1), the decreasing rearrangement of the stick-breaking sequence B₁ = 1−U₁, Bⱼ = (U₁⋯U_{j−1})(1−Uⱼ).`,
+    theorem: `For a prime p, let q₁(p) ≥ q₂(p) ≥ … be the prime factors of p−1 with multiplicity, with qⱼ(p) = 1 once the list is exhausted, and put Vⱼ(p) = log qⱼ(p) / log(p−1). Then for every fixed k the joint law of (V₁,…,V_k) over primes p ≤ x converges to the first k components of PD(1), the decreasing rearrangement of the stick-breaking sequence B₁ = 1−U₁, Bⱼ = (U₁⋯U_{j−1})(1−Uⱼ).`,
     eq: 'Vⱼ(p) = log qⱼ(p) / log(p−1)   ⟶   PD(1)',
     captions: [
-      ['Density of V₁', 'The histogram fills in as primes accumulate. The curve is the exact law of the largest PD(1) component, Pr[L₁ ≤ x] = ρ(1/x) with ρ the Dickman function.'],
-      ['Mean of each component', 'Solid lines: measured over the primes so far. Dashed: the PD(1) value from a 400,000-draw simulation.'],
+      ['Density of V₁', 'The histogram accumulates with the prime range. The curve is the exact density of the largest PD(1) component, x·ρ(1/x−1), with ρ the Dickman function. The measured curve lies below it in the upper tail at this range.'],
+      ['Component means', 'Circles mark the PD(1) means from 4×10⁵ draws; the measured means lie below them for j = 1, 2 and above for j ≥ 3. The first component rises monotonically over the range.'],
     ],
     panels: [['density', 'Density of V₁ to 3×10⁷'], ['means', 'Component means']],
     readout(p) {
@@ -202,7 +202,7 @@ const CARDS = [
       const near = D.pd.means[i], lim = D.pd.simMean;
       const gap = (lim[0] - near[0]) / lim[0] * 100;
       return `primes ≤ <b>${fmtInt(D.pd.x[i])}</b> · mean V₁ = <b>${near[0].toFixed(4)}</b> · ` +
-             `PD(1) value <span class="pred">${lim[0].toFixed(4)}</span> · still <b>${gap.toFixed(1)}%</b> below`;
+             `PD(1) mean <span class="pred">${lim[0].toFixed(4)}</span> · deficit <b>${gap.toFixed(1)}%</b>`;
     },
     draw(c, w, h, p, targets) {
       const i = stageIndex(D.pd.x.length, p);
@@ -220,7 +220,7 @@ const CARDS = [
         line(c1, F.X, F.Y, D.pd.grid, D.pd.theoryDensity, C.accent2, 2.2);
         legend(c1, [
           { label: 'PD(1) density, exact', colour: C.accent2 },
-          { label: 'primes so far', colour: C.accent },
+          { label: 'measured over the primes', colour: C.accent },
         ], F.m.l + 10, F.m.t + 10);
       }
       {
@@ -251,8 +251,8 @@ const CARDS = [
     theorem: `With P⁺(n) the largest prime factor, log P⁺(n)/log n and log P⁺(n+1)/log n are asymptotically independent in natural density, each with distribution function a ↦ ρ(1/a). Hence P⁺(n) < P⁺(n+1) has density exactly 1/2.`,
     eq: 'density{ P⁺(n) < P⁺(n+1) }  ⟶  1/2',
     captions: [
-      ['Density of the comparison', 'Measured over all n ≤ 6×10⁷ so far. The dashed line is the predicted 1/2.'],
-      ['Joint law against the product of marginals', 'Supremum gap between the binned joint CDF and the product of the two marginals. Zero means independent.'],
+      ['Density of the comparison', 'Measured over all n ≤ 6×10⁷ to date, with no monotone drift. The dashed line is the predicted value 1/2.'],
+      ['Departure from independence', 'Supremum distance between the binned joint distribution function and the product of the two marginals. The limit of the distance is of the order of the binning bias.'],
     ],
     panels: [['density', 'Density of P⁺(n) < P⁺(n+1)'], ['gap', 'Independence gap']],
     readout(p) {
@@ -297,16 +297,16 @@ const CARDS = [
     theorem: `Let j(n) be the least m such that every interval of m consecutive integers contains an integer coprime to n, and h(k) = sup{j(n) : ω(n) ≤ k}. Then h(k) ≤ C·k²/(log log 3k)² with C absolute, answering Jacobsthal's question whether h(k) ≪ k² and improving Iwaniec's k² log²k.`,
     eq: 'h(k)  ≤  C · k² / (log log 3k)²',
     captions: [
-      ['Primorial values j(P_k)', 'Computed exactly by sieving one period of the prime product. The curves are the two bound shapes. Only lower bounds for h(k) are computable, so the points must lie under any valid upper bound.'],
-      ['Implied constant', 'j(P_k) divided by each envelope. Falling or flat means the bound shape is not contradicted as k grows.'],
+      ['Primorial values j(P_k)', 'Computed exactly by sieving one period of the prime product; the values reproduce the published sequence. Only lower bounds for h(k) are computable, so the points necessarily lie below any valid upper bound.'],
+      ['Ratio to each envelope', 'j(P_k) divided by the two bound shapes. The ratio against the quadratic envelope rises and then flattens near 0.70; the range in k is too short for this to be read as an estimate of C.'],
     ],
     panels: [['values', 'j(P_k) against the bounds'], ['ratio', 'value ÷ envelope']],
     readout(p) {
       const k = D.jacobsthal.k[stageIndex(D.jacobsthal.k.length, p)];
       const i = Math.max(0, k - 3);
       return `k = <b>${k}</b> · j(P_k) = <b>${D.jacobsthal.j[k - 1]}</b> · ` +
-             `new envelope <b>${i < D.jacobsthal.envelope.length ? D.jacobsthal.envelope[i].toFixed(1) : '—'}</b> · ` +
-             `ratio <b>${i < D.jacobsthal.ratio.length ? D.jacobsthal.ratio[i].toFixed(3) : '—'}</b>`;
+             `new envelope <b>${i < D.jacobsthal.envelope.length ? D.jacobsthal.envelope[i].toFixed(1) : 'n/a'}</b> · ` +
+             `ratio <b>${i < D.jacobsthal.ratio.length ? D.jacobsthal.ratio[i].toFixed(3) : 'n/a'}</b>`;
     },
     draw(c, w, h, p, targets) {
       const k = D.jacobsthal.k[stageIndex(D.jacobsthal.k.length, p)];
@@ -373,8 +373,8 @@ const CARDS = [
     theorem: `For every fixed C > 0 there is c(C) > 0 such that, for all sufficiently large N, at least c(C)·N of the indices n ≤ N satisfy p_{n+1} − p_n > C log p_n. The density is over prime indices, not integers.`,
     eq: '#{ n ≤ N : p_{n+1} − p_n > C log p_n }  ≥  c(C)·N',
     captions: [
-      ['Exceedance density', 'Proportion of gaps so far exceeding C log p_n, for thresholds C. The dotted curve is the heuristic Poisson model e^{−C}. Each curve has settled to a positive value and stays there.'],
-      ['Stability across the range', 'The same densities measured in successive tens of millions of primes. Flatness is the content of a positive density; a single count could not show it.'],
+      ['Exceedance density', 'Proportion of gaps exceeding C log p_n, accumulated over the prime range, at thresholds C. The dotted curve is the heuristic Poisson reference e^{−C}, which lies above the measured curve for C > 1.6.'],
+      ['Stability across the range', 'The same densities evaluated in successive blocks of the prime range, each constant to within about 3 per cent of its mean. A single count over the whole range would not exhibit this.'],
     ],
     panels: [['curve', 'Proportion with d > C log p'], ['stable', 'Density in successive blocks']],
     readout(p) {
@@ -403,7 +403,7 @@ const CARDS = [
           if (idx >= 0 && cur[idx] > 0) dot(c1, F.X, F.Y, cs[idx], cur[idx], C.accent2, 3);
         }
         legend(c1, [
-          { label: 'measured so far', colour: C.accent },
+          { label: 'measured over the range', colour: C.accent },
           { label: 'Cramér e^−C', colour: C.dim, dash: [3, 3] },
         ], F.m.l + 10, F.m.t + 10);
       }
@@ -437,14 +437,14 @@ const CARDS = [
     theorem: `For 1 ≤ a < b let N(a,b) be the least number of distinct unit fractions summing to a/b, and N(b) = max_a N(a,b). Then c₁ log log b ≤ N(b) ≤ c₂ log log b, proving Erdős's conjecture and improving the earlier log b / log log b and √log b bounds.`,
     eq: 'N(b)  =  Θ( log log b )',
     captions: [
-      ['Greedy expansion of 5/121', 'The greedy algorithm takes the largest unit fraction that fits. Here it needs five terms; the optimal expansion needs three.'],
-      ['N(b)/log log b', 'The worst-case minimum length divided by log log b. A bounded, slowly drifting ratio is what the Θ statement predicts.'],
+      ['Greedy expansion of 5/121', 'The remainder after each greedy term, on a logarithmic scale. Greedy requires five terms here; three suffice, so the algorithm is not minimal.'],
+      ['Ratio N(b)/log log b', 'The worst-case minimum length divided by log log b. The ratio lies in [2.43, 4.80] and drifts slowly downward, as a bounded c₂ predicts. The range does not separate the three candidate envelopes by growth alone.'],
     ],
     panels: [['worked', 'Greedy vs optimal, 5/121'], ['ratio', 'N(b) ÷ log log b']],
     readout(p) {
       const w = D.egyptian.worked;
       const step = stageIndex(w.greedy.length + 1, p);
-      if (step === 0) return `5/121 = ? · greedy is about to start · optimal is <b>${w.optimal.length}</b> terms`;
+      if (step === 0) return `5/121 · greedy expansion not begun · optimal is <b>${w.optimal.length}</b> terms`;
       const s = w.greedy[step - 1];
       return `5/121 · greedy term <b>${step}</b> of ${w.greedy.length}: 1/${fmtDen(s.den)} · ` +
              `remaining <b>${s.rest === 0 ? '0' : s.rest.toExponential(1)}</b> · ` +
@@ -511,8 +511,8 @@ const CARDS = [
     theorem: `The irrationality exponent μ(x) = sup{ν : 0 < |x − p/q| < q^{−ν} for infinitely many p/q} satisfies μ(π) = 2: for every ν > 2 there is Q with |π − p/q| ≥ q^{−ν} for all q ≥ Q. Consequently the Flint–Hills series Σ 1/(n³ sin²n) converges.`,
     eq: 'μ(π) = 2',
     captions: [
-      ['Squared quality of convergents', 'q²·|π − p/q| for each convergent, computed with exact integer numerators and denominators. The theorem needs this to stay bounded; it never exceeds 1.'],
-      ['Running estimate of the exponent', 'The running maximum of −log|π − p/q| / log q. The theorem says the limsup is exactly 2, so this must flatten at 2 rather than keep climbing. √2 behaves the same way; its partial quotients are also bounded.'],
+      ['Squared quality of convergents', 'q²·|π − p/q| at each convergent, with numerators and denominators held as exact integers. The theorem requires the sequence to stay bounded; its maximum here is 0.94.'],
+      ['Running median of the exponent', 'The running median of −log|π − p/q| / log q, a visual proxy for the limsup, which is what the theorem constrains. It settles at 2.0. Individual convergents take values below 2. The control √2, whose partial quotients are also bounded, behaves identically.'],
     ],
     panels: [['quality', 'q²·|π − p/q|'], ['exponent', 'running exponent estimate']],
     readout(p) {
@@ -564,8 +564,8 @@ const CARDS = [
     theorem: `Every finite-order Hecke L-function over ℚ(√−3) and every Dirichlet L-function, ζ included, is zero-free in the half-plane Re s > 7/8, the pole at s = 1 for a principal character allowed. So the nontrivial zeros of ζ lie in 1/8 ≤ Re s ≤ 7/8, which excludes an exceptional real zero in (7/8, 1).`,
     eq: 'Re s > 7/8  ⟹  L(s, χ) ≠ 0',
     captions: [
-      ['Zeros of ζ in the critical strip', 'The first 600 nontrivial zeros. The classical de la Vallée Poussin region 1 − c/log t creeps towards Re s = 1 and bounds nothing at fixed height; the theorem gives the vertical line 7/8, which does.'],
-      ['Counting residual', 'k − (θ(t_k)/π + 1), the classical S(T). It stays within ±1 here, confirming the zero finder is not missing or inventing zeros.'],
+      ['Zeros of ζ in the critical strip', 'The first 600 nontrivial zeros. The classical de la Vallée Poussin region 1 − c/log t approaches Re s = 1 with height and bounds no fixed half-plane; the theorem supplies the vertical line 7/8, which does. The zeros are located on the critical line, so their real parts are 1/2 by construction and this panel does not test the theorem.'],
+      ['Counting residual', 'k − (θ(t_k)/π + 1), the classical S(T). It remains within ±1.2 over the range, which is the only statement the computation supports: the zero finder is consistent with the count formula.'],
     ],
     panels: [['strip', 'Zeros and the zero-free boundary'], ['residual', 'Riemann–von Mangoldt residual']],
     readout(p) {
@@ -596,6 +596,21 @@ const CARDS = [
           { label: 'Re s = 7/8, zero-free', colour: C.accent2 },
           { label: 'classical 1 − c/log t', colour: C.accent3 },
         ], F.m.l + Math.min(w1 * 0.42, 210), F.m.t + 10);
+        // The theorem's content is the emptiness of the strip between the two
+        // vertical lines; state it on the panel, since the zeros themselves are a
+        // single line and cannot show it.
+        const xA = F.X(0.5), xB = F.X(D.quasi.boundary);
+        c1.save();
+        c1.fillStyle = 'rgba(43,76,126,0.06)';
+        c1.fillRect(xB, F.m.t, xA - xB, h1 - F.m.b - F.m.t);
+        c1.fillStyle = C.accent2;
+        c1.font = '11px ui-monospace, Menlo, monospace';
+        c1.textAlign = 'center'; c1.textBaseline = 'bottom';
+        c1.fillText('no zero in this strip', (xA + xB) / 2, h1 - F.m.b - 20);
+        c1.fillStyle = C.muted;
+        c1.fillText(`${D.quasi.count} zeros, ${D.quasi.violations} violations`,
+                    (xA + xB) / 2, h1 - F.m.b - 6);
+        c1.restore();
       }
       {
         const { c: c2, w: w2, h: h2 } = ctx2d(targets[1]);
