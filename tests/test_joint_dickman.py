@@ -86,7 +86,12 @@ def test_dickman_marginal_matches_rho():
     for a in (0.25, 0.4, 0.5, 0.8, 1.0):
         assert float(dickman_marginal(a)) == pytest.approx(float(dickman(1.0 / a)))
     assert float(dickman_marginal(0.0)) == 1.0
-    # the continuous extension sends 1/a beyond the tabulated range to zero
-    assert float(dickman_marginal(1.0 / 20.0)) == 0.0
+    # The continuous extension sends 1/a beyond the tabulated range to zero.  That
+    # range is MAX_DICKMAN_U, so pick an argument that lies outside it and check the
+    # tail is negligible rather than asserting an exact threshold.
+    from openmath.poisson_dirichlet import MAX_DICKMAN_U
+
+    assert float(dickman_marginal(1.0 / (MAX_DICKMAN_U + 10.0))) == 0.0
+    assert float(dickman_marginal(0.05)) < 1e-6
     with pytest.raises(ValueError):
         dickman_marginal(1.5)

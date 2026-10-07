@@ -261,6 +261,42 @@ so the real parts are `1/2` by construction, and a zero at, say, `Re s = 0.7` wo
 appear in the computation at all. The figure is a picture of the claimed region, not a test
 of it.
 
+## The animated site
+
+`docs/` is a static GitHub Pages site. It loads one JavaScript file of numerical
+series and renders seven animations, each a function of a single progress parameter
+so that the same code drives the autoplay, the scrubber, and the first frame.
+
+- **011** the density of `V_1` fills in as primes accumulate, against the exact PD(1)
+  density `x · rho(1/x − 1)`; a second panel tracks the six component means.
+- **012** the comparison density converges on `1/2` while the independence gap falls.
+- **021** `j(P_k)` grows against both bound envelopes, with the implied constant flat
+  or falling.
+- **026** the exceedance curves for several `C` build up and hold; a second panel
+  shows the same densities in successive blocks.
+- **025** the greedy expansion of `5/121` walks down a log-scaled remainder staircase
+  while the worst-case ratio `N(b)/log log b` drifts.
+- **017** `q²|π − p/q|` accumulates for the convergents and the running median of the
+  exponent settles on `2`.
+- **003** 600 zeros of `zeta` accumulate on `Re s = 1/2`, with the theorem's fixed
+  `7/8` boundary and the classical `1 − c/log t` region for contrast.
+
+The page honours `prefers-reduced-motion` by not autoplaying, gives every animation a
+play/pause control and a scrubber, and starts each one only when it scrolls into view.
+
+To rebuild the series and refresh the site previews:
+
+```
+python scripts/build_site_data.py                 # writes docs/data.js
+python scripts/build_site_data.py --only pi,quasi # replaces named series only
+node scripts/check_site.js                        # renders every card headlessly
+node scripts/render_previews.js                   # PNGs into results/site-previews/
+```
+
+`scripts/check_site.js` catches runtime errors in the animation code without a
+browser; `scripts/render_previews.js` needs `canvas` from npm and writes the frames
+used to check the layout visually.
+
 ## Reproducing
 
 ```
@@ -294,9 +330,14 @@ src/openmath/
   quasi_riemann.py        zeta zeros, zero-free regions, zero counts
   plotting.py             shared figure style
   config.py               numerical limits
-scripts/run_experiments.py
+scripts/
+  build_site_data.py      compact animation series for the site
+  check_site.js           headless smoke test of the animation code
+  render_previews.js      render animation frames to PNG for review
+  run_experiments.py      the seven probes, figures and JSON summaries
+docs/                     the static GitHub Pages site
 tests/
-results/                  JSON summaries and figures
+results/                  JSON summaries, figures, and site previews
 ```
 
 ## References

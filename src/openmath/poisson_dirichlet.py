@@ -50,12 +50,11 @@ __all__ = [
     "normalized_log_factors",
 ]
 
-#: Largest ``u`` at which :func:`dickman` is tabulated.  The probes need ``u <= 5``
-#: (the largest is ``1/a`` for the marginal at ``a = 0.2``).  The value is set high
-#: enough that :func:`openmath.joint_dickman.dickman_marginal` and
-#: :func:`pd1_order_statistic_cdf` can invert it for small arguments; by ``u = 12``
-#: the function is around ``1e-11``, far below any quantity plotted.
-MAX_DICKMAN_U = 12.0
+#: Largest ``u`` at which :func:`dickman` is tabulated, and the cap used when
+#: inverting the variable.  ``rho`` falls off super-exponentially -- ``rho(12)`` is
+#: about ``1e-11`` and ``rho(30)`` about ``1e-30`` -- so this bound is far beyond
+#: anything a figure can show, while keeping the grid near a million entries.
+MAX_DICKMAN_U = 30.0
 
 
 #: Number of stick fragments formed per PD(1) draw.  The discarded tail is
