@@ -31,7 +31,7 @@ does not test the theorem at all, for reasons given in that section.
 | 021 | `j(P_k)`, `k <= 10` | `<= C k^2/(log log 3k)^2` | ratio rises to `0.71`, then flat |
 | 026 | density of `d_n > C log p_n`, `p <= 2*10^8` | positive for each `C` | `0.60, 0.34, 0.11` at `C = 0.5, 1, 2` |
 | 025 | `N(b)`, `b <= 220` | `Theta(log log b)` | `N(b)/log log b` in `[2.43, 4.80]` |
-| 017 | `q^2 abs(pi - p/q)`, 40 convergents | bounded, `mu(pi) = 2` | max `1`, exponent settles at `2.0` |
+| 017 | `q^2 abs(pi - p/q)`, 40 convergents | bounded, `mu(pi) = 2` | max `0.94`, exponent settles at `2.0` |
 | 003 | 600 zeros of `zeta`, with real parts | no zero in `Re s > 7/8` | 0 violations; claim not tested |
 
 ---
