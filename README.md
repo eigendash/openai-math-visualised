@@ -225,7 +225,7 @@ convergents held as exact integers and the errors as arbitrary-precision values.
 representation matters: the convergents reach `q > 6*10^22`, where a float64
 representation of `q` destroys the quantity `q^2 |pi - p/q|` entirely.
 
-**Results.** The quantities `q^2 |pi - p/q|` at the convergents have maximum `0.95` and
+**Results.** The quantities `q^2 |pi - p/q|` at the convergents have maximum `0.935` and
 minimum `0.0034`, so the sequence is bounded above by `1` as the theorem requires,
 and the empirical exponent `-log|pi - p/q| / log q` settles at `2.0` over the final ten
 convergents. The exponent is defined by a supremum over infinitely many approximants, so
