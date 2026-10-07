@@ -1,26 +1,26 @@
-# Numerical probes of seven results in the `openai/math` collection
+# Seven results from `openai/math`, checked by computation
 
-The repository [`openai/math`](https://github.com/openai/math) contains 722
-manuscripts organised into 372 result families, produced by an internal OpenAI model
-and released at varying stages of verification. The bulk of the collection concerns
-objects for which no direct numerical evaluation is available. The seven families
-treated here are those, among the 372 surveyed, whose central quantities can be
-computed directly.
+[`openai/math`](https://github.com/openai/math) is a collection of 722 mathematical
+manuscripts, written by an internal OpenAI model and released at different stages of
+verification. The manuscripts are grouped into 372 families, and they cover a great
+deal of ground: number theory, algebraic geometry, analysis, combinatorics. Most of
+the results concern objects that cannot be computed numerically at all.
 
-For each family we state the theorem in the form given by the manuscript, identify
-the quantity the theorem constrains, implement it, and compare the result against the
-predicted law. Figures are in `results/figures/` and per-run statistics in
-`results/`. The animated presentation of the same computations is in `docs/`.
+This repository takes those seven and computes the quantity in question. For each one
+we state the theorem as the manuscript states it, implement the quantity the theorem is
+about, and compare the result with the value the theorem predicts. The figures are in
+`results/figures/`, the per-run statistics in `results/`, and an animated version of
+the same computations in `docs/`.
 
 ## Status of the computations
 
-A numerical agreement with a stated asymptotic law is evidence about the statement
-and not about the proof; a disagreement admits two readings, of which an error in the
-manuscript is the less likely. In six of the seven cases below the computed quantity
-approaches the predicted value over the accessible range. In one case, family 011,
-the approach is measurably incomplete at the largest limit we could reach, and we
-quantify the shortfall rather than treat it as noise. One computation, family 003,
-does not test the theorem at all, for reasons given in that section.
+Agreeing with a stated asymptotic law is evidence about the statement, not about the
+proof, and a disagreement is more likely to be a finite-range effect than an error in
+the manuscript. In six of the seven cases below, the computed quantity approaches the
+predicted value over the range we could reach. In one case, family 011, it plainly has
+not arrived there yet: the gap is measurable at the largest limit we reach, and we
+report its size rather than dismiss it as noise. One computation, family 003, cannot
+test its theorem at all, for reasons given in that section.
 
 ## Summary
 
