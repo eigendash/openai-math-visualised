@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="4" fill="#fcfcfa"/>
+  <!-- a distribution curve with a vertical 7/8-style boundary rule -->
+  <path d="M3 25 C9 25 10 9 16 9 C22 9 23 25 29 25" fill="none" stroke="#2b4c7e" stroke-width="2.4" stroke-linecap="round"/>
+  <line x1="23.5" y1="5" x2="23.5" y2="27" stroke="#b4451f" stroke-width="2" stroke-dasharray="3 2.5"/>
+</svg>
