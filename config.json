@@ -1,0 +1,27 @@
+{
+  "pd_prime_limit": 30000000,
+  "pd_components": 8,
+  "pd_simulations": 2000000,
+  "pd_cdf_points": 120,
+  "pd_windows": 6,
+  "dickman_limit": 60000000,
+  "dickman_grid": 40,
+  "dickman_slices": 6,
+  "jacobsthal_k_max": 10,
+  "jacobsthal_extra": 2,
+  "gap_limit": 200000000,
+  "gap_thresholds": 40,
+  "gap_stability_splits": 10,
+  "egyptian_b_max": 220,
+  "egyptian_max_terms": 10,
+  "pi_terms": 40,
+  "pi_dps": 150,
+  "zeta_zeros": 600,
+  "zeta_dps": 20,
+  "character_q_max": 120,
+  "character_samples": 30,
+  "seeds": {
+    "pd": 20260924,
+    "char": 0
+  }
+}

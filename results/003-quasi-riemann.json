@@ -1,0 +1,14 @@
+{
+  "zeros": 600,
+  "t_max": 939.0243008992184,
+  "max_real_part": 0.5,
+  "violations_of_7_8": 0,
+  "dps": 20,
+  "zero_count": {
+    "zeros_below_t_max": 600,
+    "expected_smooth": 599.717259691315,
+    "deviation": 0.28274030868499267,
+    "t_max": 939.0243008992184
+  },
+  "seconds": 307.7
+}
